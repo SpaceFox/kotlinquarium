@@ -5,12 +5,12 @@ import java.util.*
 /**
  * Created by spacefox on 20/12/16.
  */
+
 class Aquarium {
     val algae = mutableListOf<Alga>()
     val fishes = mutableListOf<Fish>()
 
     private var age = 0
-    private val random = Random()
 
     fun addAlga(alga: Alga) {
         algae.add(alga)
@@ -32,14 +32,14 @@ class Aquarium {
                 .forEach {
                     when (it) {
                         is Carnivore -> {
-                            val prey = getRandomElement(survivorFishes)
+                            val prey = survivorFishes.getRandom()
                             if (prey != null && it.eat(prey)) {
                                 println("$it eats $prey")
                                 survivorFishes.remove(prey)
                             }
                         }
                         is Herbivore -> {
-                            val alga = getRandomElement(algae)
+                            val alga = algae.getRandom()
                             if (alga != null && it.eat(alga)) {
                                 println("$it eats an alga")
                                 algae.remove(alga)
@@ -54,15 +54,17 @@ class Aquarium {
         print(this)
     }
 
-    private fun <E> getRandomElement(list: List<E>): E? {
-        return if (list.isNotEmpty()) list[random.nextInt(list.size)] else null
-    }
-
     override fun toString(): String {
         var out = "Turn $age. This aquarium contains ${algae.size} algae and ${fishes.size} fishes :"
         fishes.forEach { out += "\n- $it" }
         return out
     }
+}
+
+private val random = Random()
+
+fun <E> MutableList<E>.getRandom(): E? {
+    return if (this.isNotEmpty()) this[random.nextInt(this.size)] else null
 }
 
 fun main(args: Array<String>) {
