@@ -7,32 +7,37 @@ package fr.spacefox.kotlinquarium
 // « Herbivore » et « Carnivore » qui ne peuvent pas hériter de classes.
 interface LifeForm {
     var hp: Int
+    var age: Int
 
-    fun ages()
+    fun ages() {
+        age++
+    }
 
     fun isAlive(): Boolean {
-        return hp > 0
+        return hp > 0 && age <= 20
     }
 }
 
 // Et ici on implémente la propriété pour éviter d'avoir à le faire en double
-abstract class LifeFormImpl : LifeForm {
-    override var hp: Int = 10
+abstract class LifeFormImpl(override var age: Int) : LifeForm {
+    override var hp = 10
 }
 
-class Alga : LifeFormImpl() {
+class Alga(age: Int) : LifeFormImpl(age) {
     override fun ages() {
+        super.ages()
         hp++    // An alga grows when it ages
     }
 
     override fun toString(): String {
-        return "An alga with $hp HP."
+        return "An alga of $age turns with $hp HP."
     }
 }
 
-abstract class Fish(val name: String, val sex: Sex) : LifeFormImpl() {
+abstract class Fish(val name: String, val sex: Sex, age: Int) : LifeFormImpl(age) {
 
     override fun ages() {
+        super.ages()
         hp--    // A fish goes hungry when it ages
     }
 
@@ -41,7 +46,7 @@ abstract class Fish(val name: String, val sex: Sex) : LifeFormImpl() {
     }
 
     override fun toString(): String {
-        return "${sex.symbol} $name (${this.javaClass.simpleName}, $hp HP)"
+        return "${sex.symbol} $name (${this.javaClass.simpleName}, $hp HP, $age turns)"
     }
 }
 
@@ -69,22 +74,22 @@ interface Herbivore : LifeForm {
 }
 
 // Mérou
-class Grouper(name: String, sex: Sex) : Fish(name, sex), Carnivore
+class Grouper(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Carnivore
 
 // Thon
-class Tuna(name: String, sex: Sex) : Fish(name, sex), Carnivore
+class Tuna(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Carnivore
 
 // Poisson-clown
-class Clownfish(name: String, sex: Sex) : Fish(name, sex), Carnivore
+class Clownfish(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Carnivore
 
 // Sole
-class Sole(name: String, sex: Sex) : Fish(name, sex), Herbivore
+class Sole(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Herbivore
 
 // Bar
-class Bass(name: String, sex: Sex) : Fish(name, sex), Herbivore
+class Bass(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Herbivore
 
 // Carpe
-class Carp(name: String, sex: Sex) : Fish(name, sex), Herbivore
+class Carp(name: String, sex: Sex, age: Int) : Fish(name, sex, age), Herbivore
 
 enum class Sex(val symbol: String) {
     MALE("♂"),
