@@ -23,6 +23,8 @@ class Aquarium {
     fun newTurn() {
         age++
 
+        algae.forEach(Alga::ages)
+
         val survivorFishes: MutableList<Fish> = mutableListOf()
         survivorFishes.addAll(fishes)
 
@@ -30,18 +32,19 @@ class Aquarium {
                 .asSequence()   // Indispensable pour éviter le traitement de poissons mangés
                 .filter { it in survivorFishes }
                 .forEach {
-                    when (it) {
+                    it.ages()
+                    if (it.isHungry()) when (it) {
                         is Carnivore -> {
                             val prey = survivorFishes.getRandom()
-                            if (prey != null && it.eat(prey)) {
-                                println("$it eats $prey")
+                            if (prey != null && it.eat(prey) && !prey.isAlive()) {
+                                println("✝ $prey is dead ✝")
                                 survivorFishes.remove(prey)
                             }
                         }
                         is Herbivore -> {
                             val alga = algae.getRandom()
-                            if (alga != null && it.eat(alga)) {
-                                println("$it eats an alga")
+                            if (alga != null && it.eat(alga) && !alga.isAlive()) {
+                                println("An alga is dead.")
                                 algae.remove(alga)
                             }
                         }
@@ -57,6 +60,7 @@ class Aquarium {
     override fun toString(): String {
         var out = "Turn $age. This aquarium contains ${algae.size} algae and ${fishes.size} fishes :"
         fishes.forEach { out += "\n- $it" }
+        algae.forEach { out += "\n- $it" }
         return out
     }
 }
