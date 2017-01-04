@@ -24,10 +24,22 @@ fun main(args: Array<String>) {
     metalQuarium.addFish(Carp("Joakim Brodén", Sex.MALE, 6))
     metalQuarium.addFish(Carp("Мари́я Архипова", Sex.FEMALE, 7))
 
-    var input: String?
+    var input: String? = "n"
     do {
-        metalQuarium.newTurn()
-        println("\nq to quit, <enter> for a new turn.")
-        input = readLine()
-    } while (input?.trim()?.toLowerCase() != "q")
+        when (input) {
+            "q" -> return
+            "" -> metalQuarium.newTurn()
+            "n" -> metalQuarium.newTurn()
+            "s" -> save()
+            else -> println("Unexpected command, please try again.")
+        }
+        println("\nq to quit, n or <enter> for a new turn: ")
+        input = readLine()?.trim()?.toLowerCase()
+    } while (true)
+}
+
+fun save() {
+    println("Save's name: ")
+    val name = readLine()
+    
 }
