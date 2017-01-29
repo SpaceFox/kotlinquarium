@@ -1,5 +1,7 @@
 package fr.spacefox.kotlinquarium
 
+import java.util.*
+
 /**
  * Created by spacefox on 20/12/16.
  */
@@ -29,12 +31,22 @@ class Alga(age: Int) : LifeFormImpl(age) {
         hp++    // An alga grows when it ages
     }
 
+    fun reproduces(): Alga {
+        println("° $this splits and creates a new alga °")
+        hp /= 2
+        val child = Alga(0)
+        child.hp = hp
+        return child
+    }
+
     override fun toString(): String {
-        return "An alga of $age turns with $hp HP."
+        return "An alga of age $age with $hp HP."
     }
 }
 
-abstract class Fish(val name: String, val sex: Sex, age: Int) : LifeFormImpl(age) {
+private val random = Random()
+
+abstract class Fish(val name: String, val sex: Sex, age: Int) : LifeFormImpl(age), Cloneable {
 
     override fun ages() {
         super.ages()
@@ -45,9 +57,42 @@ abstract class Fish(val name: String, val sex: Sex, age: Int) : LifeFormImpl(age
         return hp <= 5
     }
 
-    override fun toString(): String {
-        return "${sex.symbol} $name (${this.javaClass.simpleName}, $hp HP, $age turns)"
+    fun reproducesWith(partner: Fish): Fish? {
+        return if (this != partner && partner.javaClass == this.javaClass && partner.age > 0) {
+            val childSex = Sex.values()[random.nextInt(Sex.values().size)]
+            val name = "${this.name} ${partner.name}"
+                    .shuffle()
+                    .subSequence(0, (this.name.length + partner.name.length) / 2)
+                    .toString()
+            val child = when (this) {
+                is Grouper      -> Grouper  (name, childSex, 0)
+                is Tuna         -> Tuna     (name, childSex, 0)
+                is Clownfish    -> Clownfish(name, childSex, 0)
+                is Sole         -> Sole     (name, childSex, 0)
+                is Bass         -> Bass     (name, childSex, 0)
+                is Carp         -> Carp     (name, childSex, 0)
+                else            -> null
+            }
+            println("° $this reproduces with $partner and gave birth to $child °")
+            child
+        } else {
+            println("$this and $partner can't reproduces")
+            null
+        }
     }
+
+    override fun toString(): String {
+        return "${sex.symbol} $name (${this.javaClass.simpleName}, $hp HP, age $age)"
+    }
+}
+
+private fun String.shuffle(): String {
+     return String(
+             this
+                     .toCharArray()
+                     .sortedWith(Comparator<Char> { t1, t2 -> random.nextInt(3) - 2 })
+                     .toCharArray()
+     ).trim()
 }
 
 interface Carnivore : LifeForm {

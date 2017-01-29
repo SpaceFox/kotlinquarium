@@ -27,12 +27,15 @@ class Aquarium {
         val iterator = algae.listIterator()
         while (iterator.hasNext()) {
             val alga = iterator.next()
-            if (!alga.isAlive()) {
+            if (alga.isAlive()) {
+                if (alga.hp > 10) {
+                    iterator.add(alga.reproduces())
+                }
+            } else {
                 println("$alga is dead")
                 iterator.remove()
             }
         }
-
 
         val survivorFishes: MutableList<Fish> = mutableListOf()
         survivorFishes.addAll(fishes)
@@ -45,6 +48,14 @@ class Aquarium {
                     if (!it.isAlive()) {
                         println("✝ $it is dead ✝")
                         survivorFishes.remove(it)
+                    }
+                    // Les poissons qui viennent de naître ne se reproduisent pas
+                    else if (it.age > 0 && !it.isHungry()) {
+                        val partner = survivorFishes.filter { it.age > 0 }.getRandom()
+                        val child = partner?.reproducesWith(it)
+                        if (child != null) {
+                            survivorFishes.add(child)
+                        }
                     }
                     else if (it.isHungry()) when (it) {
                         is Carnivore -> {
@@ -80,7 +91,7 @@ class Aquarium {
 
 private val random = Random()
 
-fun <E> MutableList<E>.getRandom(): E? {
+fun <E> List<E>.getRandom(): E? {
     return if (this.isNotEmpty()) this[random.nextInt(this.size)] else null
 }
 
